@@ -224,15 +224,18 @@ double tmpClock[MAX_CLOCKS];
 		int min,max, i,step=1;
 		char fName[50];
 		char fNameB[50];
+
 		Eigen::Matrix4f transMat = Eigen::Matrix4f::Identity();
 		Eigen::Matrix4f tmpTrans = Eigen::Matrix4f::Identity();
 		Eigen::Matrix4f tmpTransB = Eigen::Matrix4f::Identity();
 		Eigen::Matrix4f firstRot = Eigen::Matrix4f::Identity();
 		bool hasOutfile = false;
+
 		CloudPtr saveCloud(new Cloud);
 		CloudPtr copyCloud(new Cloud);
+
 		mapgmu::PathFinder pf;
-		bool hasGps;
+		bool hasGps=false;
 		std::string gpsKmlFile, ftFile;
 		int segIdx = 0;
 		PointXYZ currPoint,prevPoint;
@@ -301,14 +304,16 @@ double tmpClock[MAX_CLOCKS];
 	{
 		hasGps = true;
 		parse_argument (argc, argv, "-gps", gpsKmlFile);
+		cout<<"Loading "<<gpsKmlFile<<endl;
 		pf.loadKml(gpsKmlFile,"my path");
 	}
 	else if (transType >= 11)
 	{
-		cout << "Cannout run type GPS without kml gps input file <-gps [path-to-kml]>"<< endl;
+		cout << "Cannot run type GPS without kml gps input file <-gps [path-to-kml]>"<< endl;
 		usage(argv);
 		return(0);
 	}
+
 
 	//Intensity Filter switch
 	if (find_switch (argc, argv, "-iFilt") )
@@ -324,12 +329,13 @@ double tmpClock[MAX_CLOCKS];
 		parse_argument (argc, argv, "-lft", ftFile);
 		tmpTrans = tmpTrans*LoadFinalTransform(ftFile.c_str());
 		cout << "Loaded starting transform:" << endl << tmpTrans << endl;
-	}	
+	}
 
 	min = atoi(minIdx.c_str());
 	max = atoi(maxIdx.c_str());
 
 	START_TIMER(0);
+
 
 	for (i=min;i<=max;i+=step)
 	{
@@ -347,7 +353,7 @@ double tmpClock[MAX_CLOCKS];
 		sprintf(fName,"%s/%04d.ts",fBase.c_str(),i);
 		if ((tStampFile = fopen(fName,"r")))
 		{
-			fscanf(tStampFile,"%ld",&tStamp);
+			fscanf(tStampFile,"%lld",&tStamp);
 			if (i==min)startTime = tStamp / 1.0e6;
 
 			deltaTime = (tStamp / 1.0e6) - (currTime + startTime);
@@ -360,8 +366,10 @@ double tmpClock[MAX_CLOCKS];
 			cout << fName << " not found, need timestamp for C-GPS\n" << endl;
 			return 1;
 		}
+
 		sprintf(fName,"%s/%04d.pcd",fBase.c_str(),i);
-		//cout << "Processing " << fName << "..." << endl;
+
+    cout << "Processing " << fName << "..." << endl;
 
 		if (iFilter)
 		{
@@ -371,6 +379,7 @@ double tmpClock[MAX_CLOCKS];
 		if (!cloud_->empty())
 		{
 			tmpTransB = tmpTrans;
+
 			//switch case for the tranformation types
 			switch(transType)
 			{
@@ -446,7 +455,6 @@ double tmpClock[MAX_CLOCKS];
 			}
 
 		}
-
 
 		//calculate distance traveled and acceleration
 		prevVert = currVert;
