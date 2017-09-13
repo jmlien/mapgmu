@@ -18,22 +18,33 @@ target_link_libraries ( pcdviewer
   ${PCL_FEATURES_LIBRARIES}
   ${GeographicLib_LIBRARIES}
 )
- 
+
 add_executable (pcapdump PcapDump.cpp MyHdlGrabber.cpp )
 target_link_libraries ( pcapdump
   ${PCAP_LIBRARY}
-  libpcap.a 
+  libpcap.a
   ${PCL_COMMON_LIBRARIES}
   ${PCL_IO_LIBRARIES}
   ${PCL_FEATURES_LIBRARIES}
   ${PCL_VISUALIZATION_LIBRARIES}
 )
- 
+
 add_executable (cloud_reg_adapt CloudRegister.cpp)
 SET_TARGET_PROPERTIES(cloud_reg_adapt PROPERTIES
   COMPILE_FLAGS "-DADAPT_SIMPLEX"
 )
+
 target_link_libraries ( cloud_reg_adapt
+  ${PCL_COMMON_LIBRARIES}
+  ${PCL_IO_LIBRARIES}
+  ${PCL_FEATURES_LIBRARIES}
+  ${PCL_VISUALIZATION_LIBRARIES}
+  ${PCL_REGISTRATION_LIBRARIES}
+  ${GeographicLib_LIBRARIES}
+)
+
+add_executable (lum LUM.cpp)
+target_link_libraries ( lum
   ${PCL_COMMON_LIBRARIES}
   ${PCL_IO_LIBRARIES}
   ${PCL_FEATURES_LIBRARIES}
