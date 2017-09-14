@@ -1,0 +1,31 @@
+
+#variables
+pcap="Pond-counter.pcap"
+start=$1
+end=$2
+skip=2
+folder=`echo $pcap | sed 's/\(.*\)\.pcap/\1/'`
+gps="Pond-counter-S16.kml"
+
+#"NONE", "ICP", "NDT", "ICP_NL_NORM", "ADAPT_ICP", "DoN", "NDTDoN", "INT", "VOX", "CUBE", "C-ICP",
+#"C-GPS-ICP", "C-GPS", "GPS-ICP", "GPS-ICP-C", "GPS-ICP-NC", "GPS", "C-GPS-ICP-ADAPT"
+method="GPS"
+
+transFile="trans-$folder-$method-$start-$end.mat"
+
+#start to register
+if [ ! -d "$folder" ]; then
+  echo "Dump $pcap to $folder"
+  ./pcapdump -cal velodyne-calib.xml -pcap $pcap -zFix
+fi
+
+echo "Registering start frame=$start, end frame=$end"
+if [ ! -f "$transFile" ]; then
+  if [ -f "$gps" ]; then
+    ./cloud_reg_adapt -minIdx $start -maxIdx $end -t $method -fb $folder -trFile $transFile -s $skip -gps $gps
+  else
+    ./cloud_reg_adapt -minIdx $start -maxIdx $end -t $method -fb $folder -trFile $transFile -s $skip
+  fi
+fi
+
+./pcdviewer -transFile $transFile -min $start -max $end

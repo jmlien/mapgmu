@@ -2,7 +2,7 @@
  * Software License Agreement (BSD License)
  *
  *  Point Cloud Library (PCL) - www.pointclouds.org
- *  Copyright (c) 2012 The MITRE Corporation
+ *  Copyright (c) 2017 The MITRE Corporation
  *
  *  All rights reserved.
  *
